@@ -5,14 +5,16 @@ import sys
 
 
 class Parser(HTMLParser):
-    data = []
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.data = []
 
     def handle_data(self, data):
         self.data.append(data + '\n')
 
 
 def get_words_from_url(url):
-    print "handling url: %s" % url
+    print "handling URL:<%s>" % url
 
     fp = urllib.urlopen(url)
 
