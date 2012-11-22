@@ -24,7 +24,6 @@ def simple_loan(con_dict):
     formula = CF / ((1 + i) ** n) - PV
     target = set(["PV", "CF", "i", "n"]).difference(con_dict.keys()).pop()
     tmp = solve(formula, target).pop()
-    print tmp
     return tmp.subs(con_dict)
 
 
@@ -56,8 +55,16 @@ def fixed_pay_loan(con_dict, n):
 
     formula = SUM(gen, xrange(1, n + 1)) - LV
     target = set(["LV", "FP", "i"]).difference(con_dict.keys()).pop()
-    tmp = solve(formula, target).pop()
-    return tmp.subs(con_dict)
+    if target == "i":
+        Fi = formula.subs(con_dict)
+
+        def func(x):
+            return Fi.subs({"i": x})
+
+        return bisection(func, 0, 1)
+    else:
+        tmp = solve(formula, target).pop()
+        return tmp.subs(con_dict)
 
 
 def coupon_bond(con_dict, n):
