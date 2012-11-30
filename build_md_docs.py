@@ -36,6 +36,8 @@ class build_docs():
                     fp_conf = open(self.tpl_conf)
                     conf = json.load(fp_conf, encoding='utf-8')
                     fp_conf.close()
+                # TODO: there is something wrong with template, just return
+                # template now
                 #return template % conf
                 return template
         except IndexError:
