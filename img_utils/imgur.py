@@ -20,5 +20,13 @@ def upload(image):
 
 
 if __name__ == "__main__":
-    #print upload('/tmp/img.jpg')
-    pass
+    import optparse
+    parser = optparse.OptionParser()
+    parser.add_option('-u', '--upload', dest='upload', metavar='FILE',
+                      help="upload file to imgur.com")
+
+    opts, args = parser.parse_args()
+    if opts.upload:
+        print upload(opts.upload)
+    else:
+        parser.print_help()
