@@ -3,7 +3,7 @@ import os.path
 CLIENT_ID = 'd968b2b8df7f127'
 
 
-def upload(image):  # image could be 'path' or 'image data'
+def upload(image):  # image could be 'path' , 'file' or 'image data'
     try:
         import requests
     except ImportError:
@@ -14,6 +14,8 @@ def upload(image):  # image could be 'path' or 'image data'
     headers = {'Authorization': 'Client-ID %s' % CLIENT_ID}
     if isinstance(image, str):
         image_data = open(image, 'rb').read()
+    elif isinstance(image, file):
+        image_data = image.read()
     else:
         image_data = image
     files = {'image': image_data}
