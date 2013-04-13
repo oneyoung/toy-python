@@ -1,3 +1,5 @@
+import os.path
+
 CLIENT_ID = 'd968b2b8df7f127'
 
 
@@ -16,7 +18,12 @@ def upload(image):
     result = response.json()
     if result.get('status'):
         link = result.get('data').get('link')
-        return link
+        base, ext = os.path.splitext(link)
+        return {
+            'origin': link,
+            'small': base + 's' + ext,
+            'large': base + 'l' + ext,
+        }
 
 
 if __name__ == "__main__":
