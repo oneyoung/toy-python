@@ -3,7 +3,7 @@ import os.path
 CLIENT_ID = 'd968b2b8df7f127'
 
 
-def upload(image):
+def upload(image):  # image could be 'path' or 'image data'
     try:
         import requests
     except ImportError:
@@ -12,7 +12,11 @@ def upload(image):
         raise ImportError
     url = "https://api.imgur.com/3/upload"
     headers = {'Authorization': 'Client-ID %s' % CLIENT_ID}
-    files = {'image': open(image, 'rb').read()}
+    if isinstance(image, str):
+        image_data = open(image, 'rb').read()
+    else:
+        image_data = image
+    files = {'image': image_data}
 
     response = requests.post(url, headers=headers, files=files, verify=False)
     result = response.json()
