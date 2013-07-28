@@ -2,65 +2,73 @@
 import markdown
 import os
 import codecs
-import json
 
 
-class build_docs():
-
+class MdBase():
     def __init__(self, **kwargs):
-        self.indir = kwargs.pop("indir", ".")
-        self.outdir = kwargs.pop("outdir", ".")
-        self.tpl = kwargs.pop("tpl", None)
-        self.tpl_conf = kwargs.pop("tpl_conf", None)
         self.extension = kwargs.pop("extension", ['fenced_code'])
+        self.md = markdown.Markdown(extensions=self.extension)
 
-        self.finalize_options()
+        tpl = kwargs.pop("tpl", None)
+        self.template = self.read(tpl) if tpl else None
 
-    def _get_docs(self):
-        for root, dirs, files in os.walk(self.indir):
-            for f in files:
-                if f.endswith(".md"):
-                    path = os.path.join(root, f)
-                    yield path
+    def has_template(self):
+        return True if self.template else False
 
-    def finalize_options(self):
-        self.docs = self._get_docs()
-        self.template = self._get_tpl()
+    def read(self, fpath):
+        f = codecs.open(fpath, encoding='utf-8')
+        content = f.read()
+        f.close()
 
-    def _get_tpl(self):
-        try:
-            if self.tpl:
-                conf = {}
-                f = codecs.open(self.tpl, encoding='utf-8')
-                template = f.read()
-                f.close()
-                if self.tpl_conf:
-                    fp_conf = open(self.tpl_conf)
-                    conf = json.load(fp_conf, encoding='utf-8')
-                    fp_conf.close()
-                # TODO: there is something wrong with template, just return
-                # template now
-                #return template % conf
-                return template
-        except IndexError:
-            print ("generate template failed, skip.")
+        return content
 
-    def run(self):
-        md = markdown.Markdown(extensions=self.extension)
-        for infile in self.docs:
+    def convert(self, md):
+        '''
+        convert markdown file to html string.
+        para: md can be file object or file path
+        return: html string.
+        '''
+        if isinstance(md, file):
+            f = md
+        elif isinstance(md, str):
+            f = codecs.open(md, encoding='utf-8')
+        return self.md.convert(f.read())
+
+    def render(self, **kwargs):
+        '''
+        render html with template
+        '''
+        return self.template % kwargs
+
+    def save(self, strs, fpath):
+        '''
+        save strs to fpath
+        '''
+        doc = open(fpath, 'wb')
+        doc.write(strs.encode('utf-8'))
+        doc.close()
+
+
+def scan_dir(indir='.', outdir='.', **kwargs):
+        md = MdBase(kwargs)
+
+        def docs():
+            for root, dirs, files in os.walk(indir):
+                for f in files:
+                    if f.endswith(".md"):
+                        path = os.path.join(root, f)
+                        yield path
+
+        for infile in docs():
             fname = os.path.basename(infile).split('.')[0] + ".html"
-            outfile = os.path.join(os.path.realpath(self.outdir), fname)
+            outfile = os.path.join(os.path.realpath(outdir), fname)
             print ('Conv %s ==> %s' % (infile, outfile))
-            f = codecs.open(infile, encoding='utf-8')
-            body = md.convert(f.read())
-            f.close()
-            if self.template:
-                out = self.template % {'body': body}
+            body = md.convert(infile)
+            if md.has_template():
+                out = md.render({'body': body})
             else:
                 out = body
-            doc = open(outfile, 'wb')
-            doc.write(out.encode('utf-8'))
-            doc.close()
+            md.save(out, outfile)
 
 
 def get_option(sysargs):
@@ -81,5 +89,4 @@ def get_option(sysargs):
 
 
 if __name__ == "__main__":
-    build = build_docs(tpl="template.html")
-    build.run()
+    scan_dir(tpl="template.html")
