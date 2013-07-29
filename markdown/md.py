@@ -34,11 +34,11 @@ class MdBase():
             f = codecs.open(md, encoding='utf-8')
         return self.md.convert(f.read())
 
-    def render(self, **kwargs):
+    def render(self, dicts):
         '''
         render html with template
         '''
-        return self.template % kwargs
+        return self.template % dicts
 
     def save(self, strs, fpath):
         '''
