@@ -2,6 +2,7 @@
 import markdown
 import os
 import codecs
+from jinja2 import Template
 
 
 class MdBase():
@@ -10,7 +11,7 @@ class MdBase():
         self.md = markdown.Markdown(extensions=self.extension)
 
         tpl = kwargs.pop("tpl", None)
-        self.template = self.read(tpl) if tpl else None
+        self.template = Template(self.read(tpl)) if tpl else None
 
     def has_template(self):
         return True if self.template else False
@@ -38,7 +39,7 @@ class MdBase():
         '''
         render html with template
         '''
-        return self.template % dicts
+        return self.template.render(dicts)
 
     def save(self, strs, fpath):
         '''
