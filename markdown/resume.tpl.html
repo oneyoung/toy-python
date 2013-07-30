@@ -196,6 +196,22 @@
       right: 0px;
   }
 
+  /* hint message */
+  .hint {
+    display: none;
+    position: absolute;
+    margin-top: 5px;
+    width: 75px;
+    background-color: silver;
+    font-size: smaller;
+    text-align: center;
+    border: 1px solid;
+  }
+
+  .hint:hover {
+    display: block;
+  }
+
   /* hide some elements in print mode */
   @media print {
     .content {
@@ -227,8 +243,18 @@
       }
 
       lanSwitch.onchange = updateLanguage;  /* event binding */
-
       updateLanguage();  /* init check */
+
+      var onOffSwitch = document.querySelector(".onoffswitch");
+      var hintDiv = document.querySelector(".hint");
+
+      onOffSwitch.onmouseover = function () {
+        hintDiv.style.display = "block";
+      };
+
+      onOffSwitch.onmouseout = function () {
+        hintDiv.style.display = "none";
+      };
     };
   </script>
 </head>
@@ -241,6 +267,7 @@
       <div class="onoffswitch-inner"></div>
       <div class="onoffswitch-switch"></div>
     </label>
+    <div class="hint">Language</div>
   </div>
 
   <div id="en">
